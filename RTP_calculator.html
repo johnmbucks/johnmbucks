@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RTP Calculator</title>
+
+    <style>
+
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f4f4f4; }
+
+        h1 { text-align: center; color: #333; }
+
+        form { background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+
+        label { display: block; margin: 10px 0 5px; }
+
+        input[type="number"] { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+
+        button { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+
+        button:hover { background-color: #218838; }
+
+        #results { margin-top: 20px; padding: 10px; background: #fff; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+
+        .error { color: red; }
+
+        .rtp-high { color: green; font-weight: bold; }
+
+        .rtp-low { color: red; font-weight: bold; }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Tennis RTP and Win Probability Calculator</h1>
+
+    <form onsubmit="calculateRTP(event)">
+
+        <label for="odds_a">Odds for Player A:</label>
+
+        <input type="number" step="0.01" id="odds_a" required placeholder="e.g., 5.60">
+
+        <label for="odds_b">Odds for Player B:</label>
+
+        <input type="number" step="0.01" id="odds_b" required placeholder="e.g., 1.09">
+
+        <button type="submit">Calculate</button>
+
+    </form>
+
+    <div id="results"></div>
+
+
+
+    <script>
+
+        function calculateRTP(event) {
+
+            event.preventDefault();
+
+            const oddsA = parseFloat(document.getElementById("odds_a").value);
+
+            const oddsB = parseFloat(document.getElementById("odds_b").value);
+
+            const resultsDiv = document.getElementById("results");
+
+
+
+            if (isNaN(oddsA) || isNaN(oddsB) || oddsA <= 1 || oddsB <= 1) {
+
+                resultsDiv.innerHTML = '<p class="error">Invalid odds. Please enter positive numbers greater than 1.</p>';
+
+                return;
+
+            }
+
+
+
+            // Calculate implied probabilities
+
+            const impliedProbA = 100 / oddsA;
+
+            const impliedProbB = 100 / oddsB;
+
+            const sumImpliedProbs = impliedProbA + impliedProbB;
+
+
+
+            // Calculate RTP
+
+            const rtp = 100 * (1 / sumImpliedProbs);
+
+
+
+            // Calculate win probabilities
+
+            const winProbA = impliedProbA * (rtp / 100);
+
+            const winProbB = impliedProbB * (rtp / 100);
+
+
+
+            // Determine RTP class
+
+            const rtpClass = rtp > 94 ? 'rtp-high' : rtp < 92 ? 'rtp-low' : 'normal';
+
+
+
+            // Display results
+
+            resultsDiv.innerHTML = `
+
+                <h2>Results</h2>
+
+                <p>RTP: <span class="${rtpClass}">${rtp.toFixed(2)}%</span></p>
+
+                <p>Implied Probability Player A: ${impliedProbA.toFixed(2)}%</p>
+
+                <p>Implied Probability Player B: ${impliedProbB.toFixed(2)}%</p>
+
+                <p>Sum of Implied Probabilities: ${sumImpliedProbs.toFixed(2)}%</p>
+
+                <p>Win Probability Player A: ${winProbA.toFixed(1)}%</p>
+
+                <p>Win Probability Player B: ${winProbB.toFixed(1)}%</p>
+
+                <p>Sum of Win Probabilities: ${(winProbA + winProbB).toFixed(1)}%</p>
+
+            `;
+
+        }
+
+    </script>
+
+</body>
+
+</html>
