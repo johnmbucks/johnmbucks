@@ -96,15 +96,15 @@
 
             // Calculate RTP
 
-            const rtp = 100 * (1 / sumImpliedProbs);
+            const rtp = 1 / sumImpliedProbs;
 
 
 
             // Calculate win probabilities
 
-            const winProbA = impliedProbA * (rtp / 100);
+            const winProbA = impliedProbA * rtp;
 
-            const winProbB = impliedProbB * (rtp / 100);
+            const winProbB = impliedProbB * rtp;
 
 
 
