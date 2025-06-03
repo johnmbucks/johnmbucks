@@ -60,13 +60,13 @@
             // Display results, ensuring percentages with correct rounding
             resultsDiv.innerHTML = `
                 <h2>Results</h2>
-                <p>RTP: <span class="${rtpClass}">${rtp.toFixed(2)}%</span></p>
+                <p>RTP: <span class="${rtpClass}">${rtp.toFixed(3)}%</span></p>
                 <p>Implied Probability Player A: ${impliedProbA.toFixed(2)}%</p>
                 <p>Implied Probability Player B: ${impliedProbB.toFixed(2)}%</p>
                 <p>Sum of Implied Probabilities: ${sumImpliedProbs.toFixed(2)}%</p>
-                <p>Bookmaker's Estimated Probability Player A: ${winProbA.toFixed(1)}%</p>
-                <p>Bookmaker's Estimated Probability Player B: ${winProbB.toFixed(1)}%</p>
-                <p>Sum of Estimated Probabilities: ${(winProbA + winProbB).toFixed(1)}%</p>
+                <p>Bookmaker's Estimated Probability Player A: ${winProbA.toFixed(3)}%</p>
+                <p>Bookmaker's Estimated Probability Player B: ${winProbB.toFixed(3)}%</p>
+                <p>Sum of Estimated Probabilities: ${(winProbA + winProbB).toFixed(3)}%</p>
             `;
         }
     </script>
