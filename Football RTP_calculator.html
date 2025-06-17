@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football RTP Calculator</title>
+    <!-- Font Awesome CDN for football icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            /* Football stadium background */
+            background-image: url('images/football-stadium.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+        }
+        /* Semi-transparent overlay for readability */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: -1;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        label i {
+            color: #d32f2f; /* Red to match football theme */
+            margin-right: 5px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            /* Football-styled button */
+            background: linear-gradient(135deg, #d32f2f, #b71c1c); /* Red gradient */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #c62828, #a51919);
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        .error {
+            color: red;
+        }
+        .rtp-high {
+            color: green;
+            font-weight: bold;
+        }
+        .rtp-low {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Football RTP and Win Probability Calculator</h1>
+    <form onsubmit="calculateRTP(event)">
+        <label for="odds_home"><i class="fa-solid fa-futbol"></i> Odds for Home Win:</label>
+        <input type="number" step="0.01" id="odds_home" required placeholder="e.g., 2.15">
+        <label for="odds_draw"><i class="fa-solid fa-futbol"></i> Odds for Draw:</label>
+        <input type="number" step="0.01" id="odds_draw" required placeholder="e.g., 3.25">
+        <label for="odds_away"><i class="fa-solid fa-futbol"></i> Odds for Away Win:</label>
+        <input type="number" step="0.01" id="odds_away" required placeholder="e.g., 3.15">
+        <button type="submit">Calculate</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        function calculateRTP(event) {
+            event.preventDefault();
+            const oddsHome = parseFloat(document.getElementById("odds_home").value);
+            const oddsDraw = parseFloat(document.getElementById("odds_draw").value);
+            const oddsAway = parseFloat(document.getElementById("odds_away").value);
+            const resultsDiv = document.getElementById("results");
+
+            // Validate inputs
+            if (isNaN(oddsHome) || isNaN(oddsDraw) || isNaN(oddsAway) || oddsHome <= 1 || oddsDraw <= 1 || oddsAway <= 1) {
+                resultsDiv.innerHTML = '<p class="error">Invalid odds. Please enter positive numbers greater than 1.</p>';
+                return;
+            }
+
+            // Calculate implied probabilities (in percentage, 0–100 scale)
+            const impliedProbHome = 100 / oddsHome; // e.g., 100 / 2.15 = 46.51%
+            const impliedProbDraw = 100 / oddsDraw; // e.g., 100 / 3.25 = 30.77%
+            const impliedProbAway = 100 / oddsAway; // e.g., 100 / 3.15 = 31.75%
+            const sumImpliedProbs = impliedProbHome + impliedProbDraw + impliedProbAway; // e.g., 109.03%
+
+            // Calculate RTP (in percentage, 0–100 scale)
+            const rtp = 100 * (1 / sumImpliedProbs); // e.g., 100 / 109.03 = 92.30%
+
+            // Calculate win probabilities (in percentage, 0–100 scale)
+            const winProbHome = impliedProbHome * (rtp / 100); // e.g., 46.51 * (92.30 / 100) = 46.1%
+            const winProbDraw = impliedProbDraw * (rtp / 100); // e.g., 30.77 * (92.30 / 100) = 30.8%
+            const winProbAway = impliedProbAway * (rtp / 100); // e.g., 31.75 * (92.30 / 100) = 23.1%
+
+            // Determine RTP class for styling
+            const rtpClass = rtp > 94 ? 'rtp-high' : rtp < 92 ? 'rtp-low' : 'normal';
+
+            // Display results, ensuring percentages with correct rounding
+            resultsDiv.innerHTML = `
+                <h2>Results</h2>
+                <p>RTP: <span class="${rtpClass}">${rtp.toFixed(2)}%</span></p>
+                <p>Implied Probability Home Win: ${impliedProbHome.toFixed(2)}%</p>
+                <p>Implied Probability Draw: ${impliedProbDraw.toFixed(2)}%</p>
+                <p>Implied Probability Away Win: ${impliedProbAway.toFixed(2)}%</p>
+                <p>Sum of Implied Probabilities: ${sumImpliedProbs.toFixed(2)}%</p>
+                <p>Bookmaker's Estimated Probability Home Win: ${winProbHome.toFixed(2)}%</p>
+                <p>Bookmaker's Estimated Probability Draw: ${winProbDraw.toFixed(2)}%</p>
+                <p>Bookmaker's Estimated Probability Away Win: ${winProbAway.toFixed(2)}%</p>
+                <p>Sum of Estimated Probabilities: ${(winProbHome + winProbDraw + winProbAway).toFixed(2)}%</p>
+            `;
+        }
+    </script>
+</body>
+</html>
